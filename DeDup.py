@@ -6,10 +6,13 @@ from imutils import paths
 import numpy as np
 # import argparse
 import cv2
+import os
 import shutil
 
-imagePaths = "/gras-data/photos/To_be_sorted/misc"
-deletePath = "/gras-data/photos/deleted"
+imagePaths = "/gras-data/photos/"
+# imagePaths = "/gras-data/photos/To_be_sorted/misc/"
+deletePath = "/gras-data/photos-deleted/"
+
 
 def dhash(image, hashSize=8):
     # convert the image to grayscale and resize the grayscale image,
@@ -45,6 +48,8 @@ hashes = {}
 # loop over our image paths
 for imagePath in imagePaths:
     print(imagePath)
+    if os.stat(imagePath).st_size == 0:
+        os.remove(imagePath)
     # load the input image and compute the hash
     image = cv2.imread(imagePath)
     h = dhash(image)
@@ -56,6 +61,7 @@ for imagePath in imagePaths:
     hashes[h] = p
 
 # loop over the image hashes
+print(" %d Images found." % (len(hashes)))
 for (h, hashedPaths) in hashes.items():
     # check to see if there is more than one image with the same hash
     if len(hashedPaths) > 1:
@@ -96,9 +102,10 @@ for (h, hashedPaths) in hashes.items():
                 if num >= len(dups):
                     raise ValueError
 
-                print("removing: %s" % dups[num])
-                delName = dups[num][:-3] + 'DELETED'
-                print(delName)
+                print("moving: %s" % dups[num])
+                basename = os.path.basename(dups[num])
+                delName = deletePath + basename
+                # print(delName)
                 shutil.move(dups[num], delName)
                 dups.remove(dups[num])
             except ValueError:
