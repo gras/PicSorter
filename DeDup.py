@@ -1,6 +1,7 @@
 # USAGE
 # python detect_and_remove.py --dataset dataset
 # python detect_and_remove.py --dataset dataset --remove 1
+from copy import copy
 
 from imutils import paths
 import numpy as np
@@ -57,7 +58,8 @@ def get_hashes():
 
 
 def auto_check(dups_in):
-    dups_out = dups_in
+    num = 1    # figure out how to check for sizes
+    dups_out = remove_dups(num, dups_in)
     return dups_out
 
 
@@ -77,6 +79,7 @@ def find_dups(hashes):
             while len(dups) > 1:
                 c = display_dups(dups)
                 dups = check_response(c, dups)
+
 
 def display_dups(dups):
     print("Which one to delete? (x means skip, a means delete all, q means Quit)")
@@ -123,12 +126,16 @@ def remove_dups(num, dups):
     print("removing: %s" % dups[num])
     input_path = args['input']
     delete_path = args['output']
+    # print(input_path)
+    # print(dups[num])
+    # print(num)
     basename = str(dups[num]).split(input_path)[1]
     delName = delete_path + basename
     os.makedirs(os.path.dirname(delName), exist_ok=True)
     shutil.move(dups[num], delName)
-    dups.remove(dups[num])
-    return dups
+    result = copy(dups)
+    result.remove(dups[num])
+    return result
 
 
 if __name__ == '__main__':
