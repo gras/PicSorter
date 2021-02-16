@@ -1,0 +1,11 @@
+#!/bin/bash
+# Manages user names for zlogon and zgate utilities
+
+# Acess User
+access_user=zdjmgras
+
+# Zgate User
+zgate_user=jmgrasm
+
+# DGX User
+dgx_user=$zgate_user

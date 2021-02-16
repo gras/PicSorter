@@ -1,0 +1,37 @@
+#!/bin/bash
+# Runs scp between the home os and the dgx
+# From remote to local: scp get <remote_file> <local_destination> <optional:'recursive'>
+# From local to remote: scp put <local_file> <remote_destination> <optional:'recursive'>
+
+# Address of the DGX
+dgx_address="dgx1"
+
+# Find location of utils directory
+utils="$(dirname $(readlink -f "$0"))"
+
+# Create ssh tunnel and import users
+source ${utils}/access
+
+# Check if recursive
+if [ "$4" = "recursive" ]; then
+	recursive="-r"
+elif [ -z "$4" ]; then
+	# Do nothing
+	:
+else
+	echo "$4 is not a valid argument. Must be blank or 'recursive'"
+	exit
+fi
+
+# Put local on remote
+if [ $1 = "put" ]; then
+	scp $recursive -oProxyJump=${zgate_user}@127.0.0.1:4001 $2 ${dgx_user}@${dgx_address}:${3}
+
+# Get remote and put on local
+elif [ $1 = "get" ]; then
+	scp $recursive -oProxyJump=${zgate_user}@127.0.0.1:4001 ${dgx_user}@${dgx_address}:${2} $3
+
+# Invalid
+else
+	echo "$1 is not a valid argument. Must be either 'get' or 'put'."
+fi

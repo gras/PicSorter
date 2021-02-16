@@ -1,0 +1,11 @@
+#!/bin/bash
+# Logs into zgate
+
+# Find location of utils directory
+utils="$(dirname $(readlink -f "$0"))"
+
+# Create ssh tunnel and import users
+source ${utils}/access
+
+# Connect to zgate
+ssh -XY -p 4001 $zgate_user@127.0.0.1

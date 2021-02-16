@@ -1,0 +1,34 @@
+#!/bin/bash
+# Creates a tunnel to allow zgate connections
+
+# Find location of utils directory
+utils="$(dirname $(readlink -f "$0"))"
+
+# Set up user variables - change this file to switch users
+source ${utils}/user
+
+# Returns status of the tunnel (is it open)
+is_open()
+{
+	$(lsof -i:4001 -P | grep -q -m 1 ssh)
+}
+
+# Report status
+echo $(is_open)
+
+# If the tunnel is not open then open it
+if ! is_open; then
+	
+	# Open the tunnel window in new xterm session
+	xterm -T "SSH Tunnel" -n "SSH Tunnel" -e "echo SSH TUNNEL; ssh -XY -p 6550 $access_user@173.73.108.195 -N -L 4001:172.20.20.207:5695" &
+	
+	# Wait until the tunnel is open
+	until is_open;
+	do
+		sleep 1
+	done
+
+# If it is already open report and do nothing
+else
+	echo "Tunnel already established"
+fi

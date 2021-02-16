@@ -1,0 +1,12 @@
+#!/bin/bash
+# Logs into zgate
+
+# Find location of utils directory
+utils="$(dirname $(readlink -f "$0"))"
+
+# Create ssh tunnel and import users
+source ${utils}/vnc-access
+
+# Connect to dgx vnc
+read -p "Single Digit VNC Port Number (if 5901, then 1): " port
+vncviewer -via step -Shared 172.20.30.247:$port
